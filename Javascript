@@ -1,144 +1,124 @@
-// Parse adjacency matrix input
+// Parse adjacency matrix JSON
 function parseAdjMatrix(input) {
-    try {
-        const matrix = JSON.parse(input);
-        if (Array.isArray(matrix)) {
-            return matrix;
-        }
-        return null;
-    } catch (e) {
-        alert("Invalid adjacency matrix format!");
-        return null;
-    }
+  try {
+    const matrix = JSON.parse(input);
+    if (!Array.isArray(matrix)) throw new Error();
+    return matrix;
+  } catch {
+    alert("❌ Invalid matrix format! Example: [[0,1],[1,0]]");
+    return null;
+  }
 }
 
-// DFS function
-function dfs(adjacencyMatrix, startNode) {
-    const visited = [];
-    const stack = [startNode];
+// DFS Implementation
+function dfs(matrix, start) {
+  const visited = [];
+  const stack = [start];
 
-    while (stack.length > 0) {
-        const node = stack.pop();
-        if (!visited.includes(node)) {
-            visited.push(node);
-            for (let neighbor = adjacencyMatrix[node].length - 1; neighbor >= 0; neighbor--) {
-                if (adjacencyMatrix[node][neighbor] && !visited.includes(neighbor)) {
-                    stack.push(neighbor);
-                }
-            }
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!visited.includes(node)) {
+      visited.push(node);
+
+      for (let n = matrix[node].length - 1; n >= 0; n--) {
+        if (matrix[node][n] === 1 && !visited.includes(n)) {
+          stack.push(n);
         }
+      }
     }
-    return visited;
+  }
+  return visited;
 }
 
-// Initialize graph visualization
-function visualizeGraph(adjacencyMatrix, traversalOrder) {
-    const container = document.getElementById('graphContainer');
-    container.innerHTML = ''; // Clear previous graph
+// Graph visualization
+function visualizeGraph(matrix, order) {
+  const container = document.getElementById("graphContainer");
+  container.innerHTML = "";
 
-    const nodeCount = adjacencyMatrix.length;
-    const nodes = [];
+  const width = container.clientWidth - 80;
+  const height = container.clientHeight - 80;
 
-    // Generate nodes
-    for (let i = 0; i < nodeCount; i++) {
-        nodes.push({ id: i, x: Math.random() * 400 + 50, y: Math.random() * 300 + 50 });
-    }
+  const nodes = matrix.map((_, i) => ({
+    id: i,
+    x: Math.random() * width + 40,
+    y: Math.random() * height + 40
+  }));
 
-    // Draw edges
-    adjacencyMatrix.forEach((row, i) => {
-        row.forEach((connected, j) => {
-            if (connected && i < j) {
-                // Draw line
-                const line = document.createElement('div');
-                line.className = 'edge';
-                line.style.position = 'absolute';
-                line.style.width = '2px';
-                line.style.backgroundColor = '#34495e';
+  // Draw edges
+  matrix.forEach((row, i) => {
+    row.forEach((connected, j) => {
+      if (connected && i < j) {
+        const edge = document.createElement("div");
+        edge.className = "edge";
 
-                const startX = nodes[i].x;
-                const startY = nodes[i].y;
-                const endX = nodes[j].x;
-                const endY = nodes[j].y;
+        const x1 = nodes[i].x;
+        const y1 = nodes[i].y;
+        const x2 = nodes[j].x;
+        const y2 = nodes[j].y;
 
-                const length = Math.hypot(endX - startX, endY - startY);
-                const angle = Math.atan2(endY - startY, endX - startX) * (180 / Math.PI);
+        const length = Math.hypot(x2 - x1, y2 - y1);
+        const angle = (Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI;
 
-                line.style.top = startY + 'px';
-                line.style.left = startX + 'px';
-                line.style.width = length + 'px';
-                line.style.transformOrigin = '0 0';
-                line.style.transform = `rotate(${angle}deg)`;
+        edge.style.width = `${length}px`;
+        edge.style.left = `${x1}px`;
+        edge.style.top = `${y1}px`;
+        edge.style.transform = `rotate(${angle}deg)`;
 
-                container.appendChild(line);
-            }
-        });
+        container.appendChild(edge);
+      }
     });
+  });
 
-    // Draw nodes
-    nodes.forEach(node => {
-        const circle = document.createElement('div');
-        circle.className = 'node';
-        circle.innerText = node.id;
-        circle.style.position = 'absolute';
-        circle.style.width = '30px';
-        circle.style.height = '30px';
-        circle.style.borderRadius = '50%';
-        circle.style.backgroundColor = '#2980b9';
-        circle.style.color = '#fff';
-        circle.style.display = 'flex';
-        circle.style.justifyContent = 'center';
-        circle.style.alignItems = 'center';
-        circle.style.cursor = 'pointer';
-        circle.style.left = (node.x - 15) + 'px';
-        circle.style.top = (node.y - 15) + 'px';
-        container.appendChild(circle);
-    });
+  // Draw nodes
+  nodes.forEach((n) => {
+    const node = document.createElement("div");
+    node.className = "node";
+    node.innerText = n.id;
+    node.style.left = `${n.x - 16}px`;
+    node.style.top = `${n.y - 16}px`;
+    container.appendChild(node);
+  });
 
-    // Animate traversal
-    let index = 0;
-    const interval = setInterval(() => {
-        if (index >= traversalOrder.length) {
-            clearInterval(interval);
-            return;
-        }
-        const nodeId = traversalOrder[index];
-        const nodeElems = document.getElementsByClassName('node');
-        for (let node of nodeElems) {
-            if (parseInt(node.innerText) === nodeId) {
-                node.style.backgroundColor = '#e74c3c'; // Visited color
-            }
-        }
-        index++;
-    }, 500);
-}
+  // Animate DFS traversal
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= order.length) return clearInterval(interval);
 
-// Event handlers
-document.getElementById('runBtn').addEventListener('click', () => {
-    const input = document.getElementById('adjMatrix').value;
-    const adjacencyMatrix = parseAdjMatrix(input);
-    if (!adjacencyMatrix) return;
+    const id = order[i];
+    const nodeElements = document.getElementsByClassName("node");
 
-    const startNode = parseInt(document.getElementById('startNode').value);
-    if (isNaN(startNode) || startNode < 0 || startNode >= adjacencyMatrix.length) {
-        alert('Invalid start node!');
-        return;
+    for (let el of nodeElements) {
+      if (parseInt(el.innerText) === id) {
+        el.style.backgroundColor = "#e74c3c";
+        el.style.transform = "scale(1.15)";
+      }
     }
 
-    const result = dfs(adjacencyMatrix, startNode);
-    document.getElementById('visitedNodes').innerText = result.join(', ');
+    i++;
+  }, 600);
+}
+
+// Events
+document.getElementById("runBtn").addEventListener("click", () => {
+  const matrix = parseAdjMatrix(adjMatrix.value);
+  if (!matrix) return;
+
+  const start = parseInt(startNode.value);
+  if (isNaN(start) || start < 0 || start >= matrix.length) {
+    alert("❌ Invalid start node");
+    return;
+  }
+
+  const result = dfs(matrix, start);
+  visitedNodes.innerText = result.join(", ");
 });
 
-document.getElementById('visualizeBtn').addEventListener('click', () => {
-    const input = document.getElementById('adjMatrix').value;
-    const adjacencyMatrix = parseAdjMatrix(input);
-    if (!adjacencyMatrix) return;
+document.getElementById("visualizeBtn").addEventListener("click", () => {
+  const matrix = parseAdjMatrix(adjMatrix.value);
+  if (!matrix) return;
 
-    const startNode = parseInt(document.getElementById('startNode').value);
-    if (isNaN(startNode) || startNode < 0 || startNode >= adjacencyMatrix.length) {
-        alert('Invalid start node!');
-        return;
-    }
+  const start = parseInt(startNode.value);
+  const order = dfs(matrix, start);
 
-    const traversalOrder = dfs(adjacencyMatrix, startNode);
-    visualizeGraph(adjacencyMatrix, traversalOrder);
+  visualizeGraph(matrix, order);
 });
