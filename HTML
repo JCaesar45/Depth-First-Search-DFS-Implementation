@@ -1,37 +1,43 @@
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Depth-First Search (DFS) Visualization</title>
-    <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Depth-First Search (DFS) Visualization</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-    <header>
-        <h1>Depth-First Search (DFS) Algorithm Visualization</h1>
-        <p>Implementing graph traversal with an interactive and visually appealing webpage</p>
-    </header>
+  <header>
+    <h1>Depth-First Search (DFS) Algorithm Visualization</h1>
+    <p>Interactive graph traversal demo</p>
+  </header>
 
-    <section class="container">
-        <div class="graph-section">
-            <h2>Graph Input</h2>
-            <textarea id="adjMatrix" placeholder='Enter adjacency matrix, e.g., [[0,1],[1,0]]'></textarea>
-            <button id="runBtn">Run DFS</button>
-        </div>
+  <section class="container">
+    <div class="graph-section">
+      <h2>Graph Input</h2>
+      <textarea id="adjMatrix" placeholder='Enter adjacency matrix, e.g., [[0,1],[1,0]]'></textarea>
+      <p>Start Node:</p>
+      <input type="number" id="startNode" min="0" value="0" />
+      <button id="runBtn">Run DFS</button>
+      <button id="visualizeBtn">Visualize DFS</button>
+    </div>
 
-        <div class="output-section">
-            <h2>Traversal Output</h2>
-            <p>Starting Node: <input type="number" id="startNode" min="0" max="10" value="0" /></p>
-            <button id="visualizeBtn">Visualize DFS</button>
-            <div id="graphContainer"></div>
-            <h3>Visited Nodes:</h3>
-            <div id="visitedNodes"></div>
-        </div>
-    </section>
+    <div class="output-section">
+      <h2>Traversal Output</h2>
+      <h3>Visited Nodes:</h3>
+      <div id="visitedNodes"></div>
 
-    <footer>
-        <p>&copy; 2024 Jordan Leturgez | <a href="mailto:jordanleturgez@gmail.com">Contact</a></p>
-    </footer>
+      <h3>Graph Visualization</h3>
+      <div id="graphContainer"></div>
+    </div>
+  </section>
 
-    <script src="script.js"></script>
+  <footer>
+    <p>&copy; 2025 DFS Visualizer</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
+
 </html>
